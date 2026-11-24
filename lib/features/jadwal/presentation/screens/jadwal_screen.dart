@@ -1,10 +1,13 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import '../../../../core/accessibility/a11y_announcer.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../booking/application/booking_notifier.dart';
 
 class _ServiceCategory {
   const _ServiceCategory({
@@ -32,14 +35,14 @@ class _PoliklinikItem {
   final int dailyQuota;
 }
 
-class JadwalScreen extends StatefulWidget {
+class JadwalScreen extends ConsumerStatefulWidget {
   const JadwalScreen({super.key});
 
   @override
-  State<JadwalScreen> createState() => _JadwalScreenState();
+  ConsumerState<JadwalScreen> createState() => _JadwalScreenState();
 }
 
-class _JadwalScreenState extends State<JadwalScreen> {
+class _JadwalScreenState extends ConsumerState<JadwalScreen> {
   String _selectedCategoryId = 'klinik-spesialis';
   String _searchQuery = '';
 
@@ -374,10 +377,16 @@ class _JadwalScreenState extends State<JadwalScreen> {
                       borderRadius: BorderRadius.circular(14),
                       child: InkWell(
                         onTap: () {
-                          A11yAnnouncer.announce(
-                            context,
-                            'Membuka jadwal dokter untuk ${poli.name}',
+                          final selectedCat = _categories.firstWhere(
+                            (c) => c.id == _selectedCategoryId,
                           );
+                          ref
+                              .read(bookingProvider.notifier)
+                              .startFlow(selectedCat.title);
+                          ref
+                              .read(bookingProvider.notifier)
+                              .selectPoli(poli.name);
+                          context.push('/booking/step-2');
                         },
                         borderRadius: BorderRadius.circular(14),
                         child: Container(

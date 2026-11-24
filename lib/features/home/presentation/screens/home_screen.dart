@@ -8,6 +8,7 @@ import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../application/home_notifier.dart';
+import '../../../booking/application/booking_notifier.dart';
 import '../../../jadwal/presentation/screens/jadwal_screen.dart';
 import '../../../riwayat/presentation/screens/riwayat_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
@@ -25,7 +26,14 @@ class HomeScreen extends ConsumerWidget {
       body: IndexedStack(
         index: homeState.selectedNavIndex,
         children: [
-          _HomeTabBody(homeState: homeState, notifier: notifier),
+          _HomeTabBody(
+            homeState: homeState,
+            notifier: notifier,
+            onStartClinicFlow: (clinicTitle) {
+              ref.read(bookingProvider.notifier).startFlow(clinicTitle);
+              context.push('/booking/step-1');
+            },
+          ),
           const JadwalScreen(),
           const RiwayatScreen(),
           const SettingsScreen(),
@@ -47,10 +55,12 @@ class _HomeTabBody extends StatelessWidget {
   const _HomeTabBody({
     required this.homeState,
     required this.notifier,
+    required this.onStartClinicFlow,
   });
 
   final HomeState homeState;
   final HomeNotifier notifier;
+  final ValueChanged<String> onStartClinicFlow;
 
   @override
   Widget build(BuildContext context) {
@@ -133,11 +143,7 @@ class _HomeTabBody extends StatelessWidget {
                     } else if (service.id == 'layanan-operasi') {
                       context.push('/pelayanan-operasi');
                     } else {
-                      notifier.setNavIndex(1); // Switch to Jadwal tab
-                      A11yAnnouncer.announce(
-                        context,
-                        'Membuka jadwal untuk ${service.title}',
-                      );
+                      onStartClinicFlow(service.title);
                     }
                   },
                 ),

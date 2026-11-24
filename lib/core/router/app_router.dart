@@ -1,6 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/antrean/presentation/screens/detail_antrean_screen.dart';
+import '../../features/booking/presentation/screens/booking_step1_poli_screen.dart';
+import '../../features/booking/presentation/screens/booking_step2_dokter_screen.dart';
+import '../../features/booking/presentation/screens/booking_step3_jadwal_screen.dart';
+import '../../features/booking/presentation/screens/booking_step4_pasien_screen.dart';
+import '../../features/booking/presentation/screens/booking_step6_success_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/services/presentation/screens/pelayanan_operasi_screen.dart';
 import '../../features/services/presentation/screens/rawat_inap_screen.dart';
@@ -16,6 +21,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/',
         name: 'home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/booking/step-1',
+        name: 'booking-step-1',
+        builder: (context, state) => const BookingStep1PoliScreen(),
+      ),
+      GoRoute(
+        path: '/booking/step-2',
+        name: 'booking-step-2',
+        builder: (context, state) => const BookingStep2DokterScreen(),
+      ),
+      GoRoute(
+        path: '/booking/step-3',
+        name: 'booking-step-3',
+        builder: (context, state) => const BookingStep3JadwalScreen(),
+      ),
+      GoRoute(
+        path: '/booking/step-4',
+        name: 'booking-step-4',
+        builder: (context, state) => const BookingStep4PasienScreen(),
+      ),
+      GoRoute(
+        path: '/booking/success',
+        name: 'booking-success',
+        builder: (context, state) => const BookingStep6SuccessScreen(),
       ),
       GoRoute(
         path: '/detail-antrean',
