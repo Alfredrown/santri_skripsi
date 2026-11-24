@@ -7,6 +7,8 @@ import '../../../../core/accessibility/a11y_announcer.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/cancel_queue_dialog.dart';
 import '../../application/home_notifier.dart';
 import '../../../booking/application/booking_notifier.dart';
 import '../../../jadwal/presentation/screens/jadwal_screen.dart';
@@ -108,12 +110,15 @@ class _HomeTabBody extends StatelessWidget {
                   const Gap(12),
                   _UpcomingAppointmentCard(
                     appointment: homeState.upcomingAppointment!,
-                    onCancel: () {
-                      notifier.cancelAppointment();
-                      A11yAnnouncer.announce(
-                        context,
-                        'Jadwal kunjungan telah dibatalkan.',
-                      );
+                    onCancel: () async {
+                      final confirmed = await showCancelQueueDialog(context);
+                      if (confirmed && context.mounted) {
+                        notifier.cancelAppointment();
+                        AppToast.showInfo(
+                          context,
+                          'Jadwal kunjungan telah dibatalkan.',
+                        );
+                      }
                     },
                     onDetail: () {
                       context.push('/detail-antrean');

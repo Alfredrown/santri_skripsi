@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
+import '../../../home/application/home_notifier.dart';
 import '../../application/booking_notifier.dart';
 
 class BookingStep6SuccessScreen extends ConsumerWidget {
@@ -187,7 +189,25 @@ class BookingStep6SuccessScreen extends ConsumerWidget {
                   minHeight: A11yConstants.minTouchTargetSize,
                 ),
                 child: ElevatedButton(
-                  onPressed: () => context.push('/detail-antrean'),
+                  onPressed: () {
+                    ref.read(homeProvider.notifier).setUpcomingAppointment(
+                          UpcomingAppointment(
+                            doctorName: booking.selectedDoctor,
+                            clinicInfo:
+                                '${booking.clinicCategory} • ${booking.selectedPoli}',
+                            badgeLabel: 'TERDAFTAR',
+                            dateLabel: booking.selectedDate,
+                            timeLabel: booking.selectedTime,
+                            userQueueNumber: 1,
+                            currentQueueNumber: 1,
+                          ),
+                        );
+                    AppToast.showSuccess(
+                      context,
+                      'Jadwal kunjungan aktif ditambahkan ke Beranda.',
+                    );
+                    context.go('/');
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.onPrimary,

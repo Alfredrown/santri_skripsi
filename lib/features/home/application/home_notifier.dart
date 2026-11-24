@@ -146,6 +146,13 @@ class HomeNotifier extends Notifier<HomeState> {
     state = state.copyWith(selectedNavIndex: index);
   }
 
+  void setUpcomingAppointment(UpcomingAppointment appointment) {
+    state = state.copyWith(
+      upcomingAppointment: appointment,
+      selectedNavIndex: 0,
+    );
+  }
+
   void cancelAppointment() {
     state = state.copyWith(clearAppointment: true);
   }

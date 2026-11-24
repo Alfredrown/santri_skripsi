@@ -3,10 +3,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import '../../../../core/accessibility/a11y_announcer.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/cancel_queue_dialog.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 import '../../../home/application/home_notifier.dart';
 
@@ -426,13 +427,16 @@ class DetailAntreanScreen extends ConsumerWidget {
                     minHeight: A11yConstants.minTouchTargetSize,
                   ),
                   child: OutlinedButton.icon(
-                    onPressed: () {
-                      ref.read(homeProvider.notifier).cancelAppointment();
-                      A11yAnnouncer.announce(
-                        context,
-                        'Pemeriksaan telah dibatalkan.',
-                      );
-                      context.pop();
+                    onPressed: () async {
+                      final confirmed = await showCancelQueueDialog(context);
+                      if (confirmed && context.mounted) {
+                        ref.read(homeProvider.notifier).cancelAppointment();
+                        AppToast.showInfo(
+                          context,
+                          'Pemeriksaan telah dibatalkan.',
+                        );
+                        context.go('/');
+                      }
                     },
                     icon: const Icon(
                       Icons.logout_rounded,

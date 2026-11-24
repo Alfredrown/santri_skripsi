@@ -22,6 +22,10 @@ void main() {
     await tester.tap(find.text('Batalkan'));
     await tester.pumpAndSettle();
 
+    expect(find.text('Batalkan Antrean?'), findsOneWidget);
+    await tester.tap(find.text('Ya, Batalkan'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Dr. Malik Kudus'), findsNothing);
   });
 }
