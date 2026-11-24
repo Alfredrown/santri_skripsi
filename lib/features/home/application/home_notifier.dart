@@ -153,6 +153,24 @@ class HomeNotifier extends Notifier<HomeState> {
     );
   }
 
+  void advanceCurrentQueue() {
+    final appt = state.upcomingAppointment;
+    if (appt == null) return;
+    if (appt.currentQueueNumber < appt.userQueueNumber) {
+      state = state.copyWith(
+        upcomingAppointment: UpcomingAppointment(
+          doctorName: appt.doctorName,
+          clinicInfo: appt.clinicInfo,
+          badgeLabel: appt.badgeLabel,
+          dateLabel: appt.dateLabel,
+          timeLabel: appt.timeLabel,
+          userQueueNumber: appt.userQueueNumber,
+          currentQueueNumber: appt.currentQueueNumber + 1,
+        ),
+      );
+    }
+  }
+
   void cancelAppointment() {
     state = state.copyWith(clearAppointment: true);
   }

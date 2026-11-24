@@ -17,6 +17,13 @@ class DetailAntreanScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appointment = ref.watch(homeProvider).upcomingAppointment;
+    final userQueue = appointment?.userQueueNumber ?? 16;
+    final currentQueue = appointment?.currentQueueNumber ?? 11;
+    final patientsAhead = (userQueue - currentQueue).clamp(0, 999);
+    final progressRatio =
+        userQueue > 0 ? (currentQueue / userQueue).clamp(0.0, 1.0) : 1.0;
+    final estimatedMinutes = patientsAhead * 7;
+    final isYourTurn = patientsAhead == 0;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -231,91 +238,159 @@ class DetailAntreanScreen extends ConsumerWidget {
               ),
               const Gap(16),
 
-              // 2. Queue Progress Card
-              MergeSemantics(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0F4FF),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
+              // 2. Queue Progress Card (Live & Interactive Mock)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F4FF),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    MergeSemantics(
+                      child: Column(
                         children: [
-                          const Text(
-                            '13',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.onSurfaceVariant,
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                '$currentQueue',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                              ),
+                              const Gap(10),
+                              Expanded(
+                                child: LinearProgressIndicator(
+                                  value: progressRatio,
+                                  minHeight: 6,
+                                  backgroundColor: const Color(0xFFCBD5E1),
+                                  color: isYourTurn
+                                      ? AppColors.success
+                                      : AppColors.primary,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              const Gap(10),
+                              Text(
+                                '$userQueue',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                  color: isYourTurn
+                                      ? AppColors.success
+                                      : AppColors.primary,
+                                ),
+                              ),
+                            ],
                           ),
-                          const Gap(10),
-                          Expanded(
-                            child: LinearProgressIndicator(
-                              value: 0.25,
-                              minHeight: 4,
-                              backgroundColor: const Color(0xFFCBD5E1),
-                              color: AppColors.onSurface,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                          const Gap(10),
-                          Text(
-                            '${appointment?.userQueueNumber ?? 16}',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primary,
-                            ),
+                          const Gap(14),
+                          Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: isYourTurn
+                                      ? AppColors.success
+                                      : AppColors.primaryNavy,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  isYourTurn
+                                      ? Icons.notifications_active_rounded
+                                      : Icons.groups_outlined,
+                                  color: AppColors.onPrimary,
+                                  size: 24,
+                                ),
+                              ),
+                              const Gap(12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      isYourTurn
+                                          ? 'Giliran Anda Sekarang!'
+                                          : '$patientsAhead Pasien di Depan Anda',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.onSurface,
+                                      ),
+                                    ),
+                                    const Gap(2),
+                                    Text(
+                                      isYourTurn
+                                          ? 'Silakan menuju ruang periksa sekarang.'
+                                          : 'Estimasi panggilan: ± $estimatedMinutes menit lagi',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: AppColors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      const Gap(14),
-                      Row(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
+                    ),
+                    if (!isYourTurn) ...[
+                      const Gap(12),
+                      Semantics(
+                        button: true,
+                        label: 'Simulasikan panggilan antrean berikutnya',
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(
+                            minHeight: A11yConstants.minTouchTargetSize,
+                          ),
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              ref
+                                  .read(homeProvider.notifier)
+                                  .advanceCurrentQueue();
+                              final nextAhead = patientsAhead - 1;
+                              if (nextAhead == 0) {
+                                AppToast.showSuccess(
+                                  context,
+                                  'Giliran Anda sekarang! Silakan menuju ruang periksa.',
+                                );
+                              } else {
+                                AppToast.showInfo(
+                                  context,
+                                  'Antrean maju: $nextAhead pasien di depan Anda.',
+                                );
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.fast_forward_rounded,
+                              size: 18,
                               color: AppColors.primaryNavy,
-                              borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(
-                              Icons.groups_outlined,
-                              color: AppColors.onPrimary,
-                              size: 24,
+                            label: const Text(
+                              'Simulasi Antrean Maju (+1)',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryNavy,
+                              ),
                             ),
-                          ),
-                          const Gap(12),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '3 Pasien di Depan Anda',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.onSurface,
-                                  ),
-                                ),
-                                Gap(2),
-                                Text(
-                                  'Estimasi panggilan: 14:35 WIB (± 20 menit)',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: AppColors.surface,
+                              side: const BorderSide(color: AppColors.outline),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
               ),
               const Gap(20),
