@@ -16,6 +16,7 @@ class WebMobileFrame extends StatefulWidget {
 class _WebMobileFrameState extends State<WebMobileFrame> {
   bool _isIos = false; // Default to Android (Pixel 8: 412x915)
   double _textScale = 1.0;
+  bool _showSemantics = false;
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +90,15 @@ class _WebMobileFrameState extends State<WebMobileFrame> {
                       ),
                     ],
                   ),
+                  FilterChip(
+                    label: Text(
+                      _showSemantics
+                          ? 'TalkBack / VoiceOver Overlay: ON'
+                          : 'TalkBack / VoiceOver Overlay',
+                    ),
+                    selected: _showSemantics,
+                    onSelected: (v) => setState(() => _showSemantics = v),
+                  ),
                 ],
               ),
             ),
@@ -134,7 +144,9 @@ class _WebMobileFrameState extends State<WebMobileFrame> {
                                     ? TargetPlatform.iOS
                                     : TargetPlatform.android,
                               ),
-                              child: widget.child,
+                              child: _showSemantics
+                                  ? SemanticsDebugger(child: widget.child)
+                                  : widget.child,
                             ),
                           ),
                         ),
