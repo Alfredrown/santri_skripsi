@@ -11,6 +11,7 @@ import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/cancel_queue_dialog.dart';
 import '../../application/home_notifier.dart';
 import '../../../booking/application/booking_notifier.dart';
+import '../../../booking/data/clinic_mock_catalog.dart';
 import '../../../jadwal/presentation/screens/jadwal_screen.dart';
 import '../../../riwayat/presentation/screens/riwayat_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
@@ -88,10 +89,44 @@ class _HomeTabBody extends StatelessWidget {
                 ),
                 const Gap(12),
 
-                // 2. Search Bar
+                // 2. Search Bar (Universal Search)
                 _SearchBar(
+                  query: homeState.searchQuery,
                   onChanged: notifier.setSearchQuery,
                 ),
+                if (homeState.searchQuery.trim().isNotEmpty) ...[
+                  const Gap(12),
+                  _UniversalSearchResults(
+                    query: homeState.searchQuery,
+                    services: homeState.services,
+                    onSelectService: (service) {
+                      notifier.setSearchQuery('');
+                      if (service.id == 'layanan-kamar') {
+                        context.push('/rawat-inap');
+                      } else if (service.id == 'layanan-operasi') {
+                        context.push('/pelayanan-operasi');
+                      } else {
+                        onStartClinicFlow(service.title);
+                      }
+                    },
+                    onSelectPoli: (category, poliName) {
+                      notifier.setSearchQuery('');
+                      final booking = ProviderScope.containerOf(context)
+                          .read(bookingProvider.notifier);
+                      booking.startFlow(category);
+                      booking.selectPoli(poliName);
+                      context.push('/booking/step-2');
+                    },
+                    onSelectDoctor: (category, doctorName) {
+                      notifier.setSearchQuery('');
+                      final booking = ProviderScope.containerOf(context)
+                          .read(bookingProvider.notifier);
+                      booking.startFlow(category);
+                      booking.selectDoctor(doctorName);
+                      context.push('/booking/step-3');
+                    },
+                  ),
+                ],
                 const Gap(24),
 
                 // 3. Jadwal Mendatang
@@ -250,10 +285,41 @@ class _HeaderSection extends StatelessWidget {
   }
 }
 
-class _SearchBar extends StatelessWidget {
-  const _SearchBar({required this.onChanged});
+class _SearchBar extends StatefulWidget {
+  const _SearchBar({
+    required this.query,
+    required this.onChanged,
+  });
 
+  final String query;
   final ValueChanged<String> onChanged;
+
+  @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.query);
+  }
+
+  @override
+  void didUpdateWidget(covariant _SearchBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.query.isEmpty && _controller.text.isNotEmpty) {
+      _controller.clear();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -269,7 +335,7 @@ class _SearchBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.outline, width: 1),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.only(left: 12, right: 4),
         child: Row(
           children: [
             SvgPicture.asset(
@@ -281,7 +347,9 @@ class _SearchBar extends StatelessWidget {
             const Gap(10),
             Expanded(
               child: TextField(
-                onChanged: onChanged,
+                controller: _controller,
+                onChanged: widget.onChanged,
+                textInputAction: TextInputAction.search,
                 style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.onSurface,
@@ -301,7 +369,239 @@ class _SearchBar extends StatelessWidget {
                 ),
               ),
             ),
+            if (widget.query.isNotEmpty)
+              IconButton(
+                tooltip: 'Hapus pencarian',
+                onPressed: () {
+                  _controller.clear();
+                  widget.onChanged('');
+                },
+                icon: const Icon(
+                  Icons.close_rounded,
+                  size: 20,
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _UniversalSearchResults extends StatelessWidget {
+  const _UniversalSearchResults({
+    required this.query,
+    required this.services,
+    required this.onSelectService,
+    required this.onSelectPoli,
+    required this.onSelectDoctor,
+  });
+
+  final String query;
+  final List<HospitalServiceItem> services;
+  final ValueChanged<HospitalServiceItem> onSelectService;
+  final void Function(String category, String poliName) onSelectPoli;
+  final void Function(String category, String doctorName) onSelectDoctor;
+
+  @override
+  Widget build(BuildContext context) {
+    final q = query.trim().toLowerCase();
+    const categories = [
+      'Klinik Spesialis',
+      'Klinik Eksekutif',
+      'Telemedicine',
+      'Kanker Terpadu',
+    ];
+
+    final matchedServices =
+        services.where((s) => s.title.toLowerCase().contains(q)).toList();
+
+    final matchedPolis = <({String category, PoliMock poli})>[];
+    final matchedDoctors = <({String category, DoctorMock doctor})>[];
+
+    for (final cat in categories) {
+      final catalog = ClinicMockCatalog.forCategory(cat);
+      for (final p in catalog.polis) {
+        if (p.name.toLowerCase().contains(q)) {
+          matchedPolis.add((category: cat, poli: p));
+        }
+      }
+      for (final d in catalog.doctors) {
+        if (d.name.toLowerCase().contains(q)) {
+          matchedDoctors.add((category: cat, doctor: d));
+        }
+      }
+    }
+
+    final hasAny = matchedServices.isNotEmpty ||
+        matchedPolis.isNotEmpty ||
+        matchedDoctors.isNotEmpty;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.outline),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: !hasAny
+          ? Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                'Tidak ditemukan hasil untuk "$query". Coba kata kunci lain seperti "Jantung", "Anak", atau "Fauzi".',
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (matchedServices.isNotEmpty) ...[
+                  const _SearchSectionLabel('Layanan'),
+                  ...matchedServices.map(
+                    (s) => _SearchResultTile(
+                      icon: Icons.local_hospital_outlined,
+                      title: s.title,
+                      subtitle: 'Layanan Rumah Sakit',
+                      onTap: () => onSelectService(s),
+                    ),
+                  ),
+                ],
+                if (matchedPolis.isNotEmpty) ...[
+                  if (matchedServices.isNotEmpty) const Gap(8),
+                  const _SearchSectionLabel('Poliklinik'),
+                  ...matchedPolis.take(4).map(
+                        (item) => _SearchResultTile(
+                          icon: Icons.medical_services_outlined,
+                          title: item.poli.name,
+                          subtitle:
+                              '${item.category} • ${item.poli.doctorsCount} Dokter',
+                          onTap: () =>
+                              onSelectPoli(item.category, item.poli.name),
+                        ),
+                      ),
+                ],
+                if (matchedDoctors.isNotEmpty) ...[
+                  if (matchedServices.isNotEmpty || matchedPolis.isNotEmpty)
+                    const Gap(8),
+                  const _SearchSectionLabel('Dokter'),
+                  ...matchedDoctors.take(4).map(
+                        (item) => _SearchResultTile(
+                          icon: Icons.person_outline_rounded,
+                          title: item.doctor.name,
+                          subtitle:
+                              '${item.category} • ${item.doctor.status}',
+                          onTap: () {
+                            if (!item.doctor.available) {
+                              AppToast.showError(
+                                context,
+                                '${item.doctor.name} tidak tersedia (${item.doctor.status}).',
+                              );
+                              return;
+                            }
+                            onSelectDoctor(item.category, item.doctor.name);
+                          },
+                        ),
+                      ),
+                ],
+              ],
+            ),
+    );
+  }
+}
+
+class _SearchSectionLabel extends StatelessWidget {
+  const _SearchSectionLabel(this.label);
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: AppColors.primaryNavy,
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchResultTile extends StatelessWidget {
+  const _SearchResultTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: '$title, $subtitle',
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: A11yConstants.minTouchTargetSize,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+            child: Row(
+              children: [
+                Icon(icon, size: 20, color: AppColors.primary),
+                const Gap(10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.onSurface,
+                        ),
+                      ),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
