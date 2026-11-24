@@ -85,6 +85,7 @@ class _UbahKataSandiScreenState extends State<UbahKataSandiScreen> {
                       trailing: Semantics(
                         button: true,
                         label: 'Lupa Sandi',
+                        excludeSemantics: true,
                         child: InkWell(
                           onTap: () {
                             A11yAnnouncer.announce(
@@ -92,18 +93,24 @@ class _UbahKataSandiScreenState extends State<UbahKataSandiScreen> {
                               'Membuka bantuan pemulihan kata sandi',
                             );
                           },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 8,
+                          borderRadius: BorderRadius.circular(8),
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              minWidth: A11yConstants.minTouchTargetSize,
+                              minHeight: A11yConstants.minTouchTargetSize,
                             ),
-                            child: Text(
-                              'Lupa Sandi?',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryNavy,
-                                decoration: TextDecoration.underline,
+                            child: const Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 6),
+                                child: Text(
+                                  'Lupa Sandi?',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryNavy,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
                               ),
                             ),
                           ),

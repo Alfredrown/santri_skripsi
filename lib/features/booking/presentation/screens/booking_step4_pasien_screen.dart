@@ -207,34 +207,37 @@ class _BookingStep4PasienScreenState
                             color: AppColors.onSurface,
                           ),
                         ),
-                        Row(
-                          children: [
-                            const Text(
-                              'Isi data pengguna',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: AppColors.onSurfaceVariant,
+                        MergeSemantics(
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Isi data pengguna',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
                               ),
-                            ),
-                            Checkbox(
-                              value: _useUserData,
-                              onChanged: (v) {
-                                final checked = v ?? false;
-                                setState(() {
-                                  _useUserData = checked;
-                                  if (checked) {
-                                    _nikController.text = '312125125125';
-                                    _nameController.text = 'Ahmed';
-                                    _birthController.text = '12 Mei 1998';
-                                  } else {
-                                    _nikController.clear();
-                                    _nameController.clear();
-                                    _birthController.clear();
-                                  }
-                                });
-                              },
-                            ),
-                          ],
+                              Checkbox(
+                                semanticLabel: 'Isi data pengguna',
+                                value: _useUserData,
+                                onChanged: (v) {
+                                  final checked = v ?? false;
+                                  setState(() {
+                                    _useUserData = checked;
+                                    if (checked) {
+                                      _nikController.text = '312125125125';
+                                      _nameController.text = 'Ahmed';
+                                      _birthController.text = '12 Mei 1998';
+                                    } else {
+                                      _nikController.clear();
+                                      _nameController.clear();
+                                      _birthController.clear();
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

@@ -26,7 +26,7 @@ abstract final class AppColors {
   static const Color outline = Color(0xFFE1E1E1);
   static const Color navInactive = Color(0xFF888888);
   static const Color navActiveText = Color(0xFF1F1F1F);
-  static const Color queueMutedText = Color(0xFFDFDFDF);
+  static const Color queueMutedText = Color(0xFFFFFFFF);
   static const Color searchHint = Color(0xFF6B7280);
 
   // Service Card Icon Backgrounds
