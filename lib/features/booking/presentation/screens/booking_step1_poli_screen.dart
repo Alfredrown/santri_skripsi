@@ -8,6 +8,7 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 import '../../application/booking_notifier.dart';
+import '../../data/clinic_mock_catalog.dart';
 import '../widgets/booking_stepper.dart';
 
 class BookingStep1PoliScreen extends ConsumerStatefulWidget {
@@ -23,19 +24,11 @@ class _BookingStep1PoliScreenState
   String _searchQuery = '';
   bool _showKetentuan = false;
 
-  static const _polis = [
-    (name: 'Poli Jantung & Pembuluh Darah', doctors: 5, quota: 48),
-    (name: 'Poli Gigi', doctors: 3, quota: 30),
-    (name: 'Poli Anak', doctors: 4, quota: 40),
-    (name: 'Poli Syaraf', doctors: 2, quota: 25),
-    (name: 'Poli Kulit dan Kelamin', doctors: 3, quota: 35),
-    (name: 'Poli Penyakit Dalam', doctors: 5, quota: 50),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final booking = ref.watch(bookingProvider);
-    final filtered = _polis.where((p) {
+    final catalog = ClinicMockCatalog.forCategory(booking.clinicCategory);
+    final filtered = catalog.polis.where((p) {
       if (_searchQuery.trim().isEmpty) return true;
       return p.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
@@ -158,9 +151,9 @@ class _BookingStep1PoliScreenState
                         ),
                         if (_showKetentuan) ...[
                           const Gap(10),
-                          const Text(
-                            'Loket pendaftaran buka pukul 07.00–13.00 WIB (Senin–Sabtu). Harap datang 30 menit sebelum jadwal praktik.',
-                            style: TextStyle(
+                          Text(
+                            catalog.ketentuan,
+                            style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.onSurfaceVariant,
                               height: 1.45,
@@ -181,7 +174,7 @@ class _BookingStep1PoliScreenState
                   child: Semantics(
                     button: true,
                     label:
-                        '${poli.name}, ${poli.doctors} Dokter, Kuota ${poli.quota} pasien per hari',
+                        '${poli.name}, ${poli.doctorsCount} Dokter, Kuota ${poli.dailyQuota} pasien per hari',
                     excludeSemantics: true,
                     child: Material(
                       color: AppColors.surface,
@@ -220,7 +213,7 @@ class _BookingStep1PoliScreenState
                                     ),
                                     const Gap(4),
                                     Text(
-                                      '${poli.doctors} Dokter • Kuota ${poli.quota} pasien/hari',
+                                      '${poli.doctorsCount} Dokter • Kuota ${poli.dailyQuota} pasien/hari',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: AppColors.onSurfaceVariant,

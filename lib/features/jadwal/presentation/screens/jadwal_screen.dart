@@ -8,6 +8,7 @@ import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../booking/application/booking_notifier.dart';
+import '../../../booking/data/clinic_mock_catalog.dart';
 
 class _ServiceCategory {
   const _ServiceCategory({
@@ -21,18 +22,6 @@ class _ServiceCategory {
   final String title;
   final String iconAsset;
   final Color iconBgColor;
-}
-
-class _PoliklinikItem {
-  const _PoliklinikItem({
-    required this.name,
-    required this.doctorCount,
-    required this.dailyQuota,
-  });
-
-  final String name;
-  final int doctorCount;
-  final int dailyQuota;
 }
 
 class JadwalScreen extends ConsumerStatefulWidget {
@@ -73,32 +62,13 @@ class _JadwalScreenState extends ConsumerState<JadwalScreen> {
     ),
   ];
 
-  static const List<_PoliklinikItem> _poliklinikList = [
-    _PoliklinikItem(
-      name: 'Poli Jantung & Pembuluh Darah',
-      doctorCount: 5,
-      dailyQuota: 48,
-    ),
-    _PoliklinikItem(
-      name: 'Poli Gigi',
-      doctorCount: 3,
-      dailyQuota: 30,
-    ),
-    _PoliklinikItem(
-      name: 'Poli Anak',
-      doctorCount: 4,
-      dailyQuota: 40,
-    ),
-    _PoliklinikItem(
-      name: 'Poli Saraf',
-      doctorCount: 3,
-      dailyQuota: 25,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final filteredPolis = _poliklinikList.where((poli) {
+    final selectedCat = _categories.firstWhere(
+      (c) => c.id == _selectedCategoryId,
+    );
+    final catalog = ClinicMockCatalog.forCategory(selectedCat.title);
+    final filteredPolis = catalog.polis.where((poli) {
       if (_searchQuery.trim().isEmpty) return true;
       return poli.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
@@ -369,7 +339,7 @@ class _JadwalScreenState extends ConsumerState<JadwalScreen> {
                   child: Semantics(
                     button: true,
                     label:
-                        '${poli.name}, ${poli.doctorCount} Dokter, Kuota ${poli.dailyQuota} pasien per hari',
+                        '${poli.name}, ${poli.doctorsCount} Dokter, Kuota ${poli.dailyQuota} pasien per hari',
                     hint: 'Ketuk dua kali untuk melihat jadwal dokter',
                     excludeSemantics: true,
                     child: Material(
@@ -377,9 +347,6 @@ class _JadwalScreenState extends ConsumerState<JadwalScreen> {
                       borderRadius: BorderRadius.circular(14),
                       child: InkWell(
                         onTap: () {
-                          final selectedCat = _categories.firstWhere(
-                            (c) => c.id == _selectedCategoryId,
-                          );
                           ref
                               .read(bookingProvider.notifier)
                               .startFlow(selectedCat.title);
@@ -415,7 +382,7 @@ class _JadwalScreenState extends ConsumerState<JadwalScreen> {
                                     ),
                                     const Gap(4),
                                     Text(
-                                      '${poli.doctorCount} Dokter • Kuota ${poli.dailyQuota} pasien/hari',
+                                      '${poli.doctorsCount} Dokter • Kuota ${poli.dailyQuota} pasien/hari',
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: AppColors.onSurfaceVariant,

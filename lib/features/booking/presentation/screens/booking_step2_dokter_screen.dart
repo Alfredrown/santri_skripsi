@@ -8,6 +8,7 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 import '../../application/booking_notifier.dart';
+import '../../data/clinic_mock_catalog.dart';
 import '../widgets/booking_stepper.dart';
 
 class BookingStep2DokterScreen extends ConsumerStatefulWidget {
@@ -22,37 +23,11 @@ class _BookingStep2DokterScreenState
     extends ConsumerState<BookingStep2DokterScreen> {
   String _searchQuery = '';
 
-  static const _doctors = [
-    (
-      name: 'dr. Ahmad Fauzi, Sp. Jp',
-      schedule: 'Senin, Rabu, dan Jumat • Praktik 08.00-14.00',
-      status: 'Sisa 12 Kuota',
-      available: true,
-    ),
-    (
-      name: 'dr. Lisa Mariana, Sp. S',
-      schedule: 'Senin, Rabu, dan Jumat • Praktik 08.00-14.00',
-      status: 'Sisa 12 Kuota',
-      available: true,
-    ),
-    (
-      name: 'dr. Amir Rahman, Sp. T',
-      schedule: 'Senin dan Rabu',
-      status: 'Tidak Praktik Hari Ini',
-      available: false,
-    ),
-    (
-      name: 'dr. Siti Nurhaliza, Sp. KJ',
-      schedule: 'Senin dan Rabu',
-      status: 'Kuota Penuh Hari Ini',
-      available: false,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final booking = ref.watch(bookingProvider);
-    final filtered = _doctors.where((d) {
+    final catalog = ClinicMockCatalog.forCategory(booking.clinicCategory);
+    final filtered = catalog.doctors.where((d) {
       if (_searchQuery.trim().isEmpty) return true;
       return d.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
