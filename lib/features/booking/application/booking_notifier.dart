@@ -6,6 +6,7 @@ class BookingFlowState {
     this.selectedPoli = 'Poli Jantung & Pembuluh Darah',
     this.selectedDoctor = 'dr. Ahmad Fauzi, Sp. JP',
     this.selectedDate = 'Senin, 19 Maret 2026',
+    this.selectedDateTime,
     this.selectedTime = '10.00 WIB',
     this.patientNik = '312125125125',
     this.patientName = 'Ahmed',
@@ -17,6 +18,7 @@ class BookingFlowState {
   final String selectedPoli;
   final String selectedDoctor;
   final String selectedDate;
+  final DateTime? selectedDateTime;
   final String selectedTime;
   final String patientNik;
   final String patientName;
@@ -28,6 +30,7 @@ class BookingFlowState {
     String? selectedPoli,
     String? selectedDoctor,
     String? selectedDate,
+    DateTime? selectedDateTime,
     String? selectedTime,
     String? patientNik,
     String? patientName,
@@ -39,6 +42,7 @@ class BookingFlowState {
       selectedPoli: selectedPoli ?? this.selectedPoli,
       selectedDoctor: selectedDoctor ?? this.selectedDoctor,
       selectedDate: selectedDate ?? this.selectedDate,
+      selectedDateTime: selectedDateTime ?? this.selectedDateTime,
       selectedTime: selectedTime ?? this.selectedTime,
       patientNik: patientNik ?? this.patientNik,
       patientName: patientName ?? this.patientName,
@@ -64,8 +68,16 @@ class BookingNotifier extends Notifier<BookingFlowState> {
     state = state.copyWith(selectedDoctor: doctor);
   }
 
-  void selectSchedule({required String date, required String time}) {
-    state = state.copyWith(selectedDate: date, selectedTime: time);
+  void selectSchedule({
+    required String date,
+    required DateTime dateTime,
+    required String time,
+  }) {
+    state = state.copyWith(
+      selectedDate: date,
+      selectedDateTime: dateTime,
+      selectedTime: time,
+    );
   }
 
   void updatePatient({

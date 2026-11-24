@@ -22,8 +22,15 @@ class _BookingStep3JadwalScreenState
   int _selectedDateIdx = 0;
   String _selectedTime = '10.00';
 
-  late final List<({String day, String num, String month, String full, bool enabled})>
-      _dates = _buildUpcomingDates();
+  late final List<
+      ({
+        String day,
+        String num,
+        String month,
+        String full,
+        DateTime dateTime,
+        bool enabled
+      })> _dates = _buildUpcomingDates();
 
   static const _dayNamesUpper = [
     'SENIN',
@@ -75,11 +82,19 @@ class _BookingStep3JadwalScreenState
     'Desember',
   ];
 
-  static List<({String day, String num, String month, String full, bool enabled})>
-      _buildUpcomingDates() {
+  static List<
+      ({
+        String day,
+        String num,
+        String month,
+        String full,
+        DateTime dateTime,
+        bool enabled
+      })> _buildUpcomingDates() {
     final now = DateTime.now();
     return List.generate(7, (offset) {
-      final d = now.add(Duration(days: offset));
+      final d = DateTime(now.year, now.month, now.day)
+          .add(Duration(days: offset));
       final weekdayIdx = d.weekday - 1; // 0 = Monday .. 6 = Sunday
       final monthIdx = d.month - 1;
       // Disable Sunday (Minggu) as hospital outpatient clinics are closed
@@ -90,6 +105,7 @@ class _BookingStep3JadwalScreenState
         month: _monthShort[monthIdx],
         full:
             '${_dayNamesTitle[weekdayIdx]}, ${d.day} ${_monthFull[monthIdx]} ${d.year}',
+        dateTime: d,
         enabled: isEnabled,
       );
     });
@@ -366,6 +382,7 @@ class _BookingStep3JadwalScreenState
                   onPressed: () {
                     ref.read(bookingProvider.notifier).selectSchedule(
                           date: _dates[_selectedDateIdx].full,
+                          dateTime: _dates[_selectedDateIdx].dateTime,
                           time: '$_selectedTime WIB',
                         );
                     context.push('/booking/step-4');

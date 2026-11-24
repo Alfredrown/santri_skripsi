@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 import '../../../home/application/home_notifier.dart';
+import '../../../notifications/application/notification_notifier.dart';
 import '../../application/booking_notifier.dart';
 
 class BookingStep6SuccessScreen extends ConsumerWidget {
@@ -190,21 +191,48 @@ class BookingStep6SuccessScreen extends ConsumerWidget {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
+                    final now = DateTime.now();
+                    final today = DateTime(now.year, now.month, now.day);
+                    final target = booking.selectedDateTime ?? today;
+                    final diffDays = target.difference(today).inDays;
+
+                    final String reminderBadge;
+                    if (diffDays <= 0) {
+                      reminderBadge = 'HARI INI';
+                    } else if (diffDays == 1) {
+                      reminderBadge = 'H-1';
+                    } else if (diffDays == 2) {
+                      reminderBadge = 'H-2';
+                    } else if (diffDays == 3) {
+                      reminderBadge = 'H-3';
+                    } else {
+                      reminderBadge = 'H-$diffDays';
+                    }
+
                     ref.read(homeProvider.notifier).setUpcomingAppointment(
                           UpcomingAppointment(
                             doctorName: booking.selectedDoctor,
                             clinicInfo:
                                 '${booking.clinicCategory} • ${booking.selectedPoli}',
-                            badgeLabel: 'TERDAFTAR',
+                            badgeLabel: reminderBadge,
                             dateLabel: booking.selectedDate,
                             timeLabel: booking.selectedTime,
                             userQueueNumber: 1,
                             currentQueueNumber: 1,
                           ),
                         );
+
+                    ref.read(notificationProvider.notifier).addNotification(
+                          title: 'Pengingat Jadwal ($reminderBadge)',
+                          body:
+                              'Antrean #001 untuk ${booking.selectedDoctor} (${booking.selectedPoli}) pada ${booking.selectedDate} pukul ${booking.selectedTime} berhasil terdaftar.',
+                          type: NotificationType.reminder,
+                          routeTarget: '/detail-antrean',
+                        );
+
                     AppToast.showSuccess(
                       context,
-                      'Jadwal kunjungan aktif ditambahkan ke Beranda.',
+                      'Jadwal aktif ($reminderBadge) ditambahkan & pengingat diaktifkan.',
                     );
                     context.go('/');
                   },

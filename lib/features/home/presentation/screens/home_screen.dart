@@ -14,6 +14,7 @@ import '../../../booking/application/booking_notifier.dart';
 import '../../../booking/data/clinic_mock_catalog.dart';
 import '../../../jadwal/presentation/screens/jadwal_screen.dart';
 import '../../../news/data/news_mock_data.dart';
+import '../../../notifications/application/notification_notifier.dart';
 import '../../../riwayat/presentation/screens/riwayat_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 
@@ -24,6 +25,8 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeProvider);
     final notifier = ref.read(homeProvider.notifier);
+    final notifications = ref.watch(notificationProvider);
+    final unreadCount = notifications.where((n) => !n.isRead).length;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -33,6 +36,7 @@ class HomeScreen extends ConsumerWidget {
           _HomeTabBody(
             homeState: homeState,
             notifier: notifier,
+            unreadNotifications: unreadCount,
             onStartClinicFlow: (clinicTitle) {
               ref.read(bookingProvider.notifier).startFlow(clinicTitle);
               context.push('/booking/step-1');
@@ -59,11 +63,13 @@ class _HomeTabBody extends StatelessWidget {
   const _HomeTabBody({
     required this.homeState,
     required this.notifier,
+    required this.unreadNotifications,
     required this.onStartClinicFlow,
   });
 
   final HomeState homeState;
   final HomeNotifier notifier;
+  final int unreadNotifications;
   final ValueChanged<String> onStartClinicFlow;
 
   @override
@@ -81,12 +87,8 @@ class _HomeTabBody extends StatelessWidget {
                 _HeaderSection(
                   dateText: homeState.dateText,
                   userName: homeState.userName,
-                  onNotificationTap: () {
-                    A11yAnnouncer.announce(
-                      context,
-                      'Membuka halaman notifikasi',
-                    );
-                  },
+                  unreadCount: unreadNotifications,
+                  onNotificationTap: () => context.push('/notifikasi'),
                 ),
                 const Gap(12),
 
@@ -216,11 +218,13 @@ class _HeaderSection extends StatelessWidget {
   const _HeaderSection({
     required this.dateText,
     required this.userName,
+    required this.unreadCount,
     required this.onNotificationTap,
   });
 
   final String dateText;
   final String userName;
+  final int unreadCount;
   final VoidCallback onNotificationTap;
 
   @override
@@ -260,8 +264,11 @@ class _HeaderSection extends StatelessWidget {
         ),
         Semantics(
           button: true,
-          label: 'Notifikasi',
+          label: unreadCount > 0
+              ? 'Notifikasi, $unreadCount belum dibaca'
+              : 'Notifikasi',
           hint: 'Ketuk dua kali untuk membuka daftar notifikasi',
+          excludeSemantics: true,
           child: InkWell(
             onTap: onNotificationTap,
             borderRadius: BorderRadius.circular(24),
@@ -271,11 +278,33 @@ class _HeaderSection extends StatelessWidget {
                 minHeight: A11yConstants.minTouchTargetSize,
               ),
               child: Center(
-                child: SvgPicture.asset(
-                  AppAssets.bell,
-                  width: 28,
-                  height: 28,
-                  excludeFromSemantics: true,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    SvgPicture.asset(
+                      AppAssets.bell,
+                      width: 28,
+                      height: 28,
+                      excludeFromSemantics: true,
+                    ),
+                    if (unreadCount > 0)
+                      Positioned(
+                        right: -2,
+                        top: -2,
+                        child: Container(
+                          width: 11,
+                          height: 11,
+                          decoration: BoxDecoration(
+                            color: AppColors.danger,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.background,
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ),

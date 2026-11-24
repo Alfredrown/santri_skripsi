@@ -8,6 +8,7 @@ import '../../features/booking/presentation/screens/booking_step4_pasien_screen.
 import '../../features/booking/presentation/screens/booking_step6_success_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/news/presentation/screens/news_detail_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/services/presentation/screens/pelayanan_operasi_screen.dart';
 import '../../features/services/presentation/screens/rawat_inap_screen.dart';
 import '../../features/settings/presentation/screens/faq_screen.dart';
@@ -84,6 +85,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => NewsDetailScreen(
           articleId: state.pathParameters['id'] ?? '',
         ),
+      ),
+      GoRoute(
+        path: '/notifikasi',
+        name: 'notifikasi',
+        builder: (context, state) => const NotificationsScreen(),
       ),
     ],
   );
