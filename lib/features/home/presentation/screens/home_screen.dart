@@ -13,6 +13,7 @@ import '../../application/home_notifier.dart';
 import '../../../booking/application/booking_notifier.dart';
 import '../../../booking/data/clinic_mock_catalog.dart';
 import '../../../jadwal/presentation/screens/jadwal_screen.dart';
+import '../../../news/data/news_mock_data.dart';
 import '../../../riwayat/presentation/screens/riwayat_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 
@@ -189,7 +190,7 @@ class _HomeTabBody extends StatelessWidget {
                 ),
                 const Gap(24),
 
-                // 5. Berita Section
+                // 5. Berita Carousel Section
                 Semantics(
                   header: true,
                   child: const Text(
@@ -202,7 +203,7 @@ class _HomeTabBody extends StatelessWidget {
                   ),
                 ),
                 const Gap(10),
-                const _AccessibilityNewsCard(),
+                const _NewsCarousel(),
               ],
             ),
           ),
@@ -999,123 +1000,224 @@ class _HospitalServicesGrid extends StatelessWidget {
   }
 }
 
-class _AccessibilityNewsCard extends StatelessWidget {
-  const _AccessibilityNewsCard();
+class _NewsCarousel extends StatefulWidget {
+  const _NewsCarousel();
+
+  @override
+  State<_NewsCarousel> createState() => _NewsCarouselState();
+}
+
+class _NewsCarouselState extends State<_NewsCarousel> {
+  final PageController _pageController = PageController(viewportFraction: 0.94);
+  int _currentPage = 0;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MergeSemantics(
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0D000000),
-              blurRadius: 4,
-              offset: Offset(0, 1),
-            ),
-          ],
+    const articles = NewsMockData.articles;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: 360,
+          child: PageView.builder(
+            controller: _pageController,
+            padEnds: false,
+            itemCount: articles.length,
+            onPageChanged: (idx) => setState(() => _currentPage = idx),
+            itemBuilder: (context, index) {
+              final article = articles[index];
+              return Padding(
+                padding: EdgeInsets.only(
+                  right: index == articles.length - 1 ? 0 : 12,
+                ),
+                child: _NewsCard(
+                  article: article,
+                  onTap: () => context.push('/berita/${article.id}'),
+                ),
+              );
+            },
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 176,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    AppAssets.newsAccessibility,
-                    fit: BoxFit.cover,
-                    semanticLabel:
-                        'Lobi utama rumah sakit yang ramah disabilitas dan lansia',
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Color(0xCC002546),
-                          Color(0x00002546),
-                        ],
-                        stops: [0.0, 0.55],
+        const Gap(12),
+        // Page Indicators
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(articles.length, (index) {
+            final isActive = index == _currentPage;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: isActive ? 22 : 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: isActive ? AppColors.primary : AppColors.outline,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+class _NewsCard extends StatelessWidget {
+  const _NewsCard({
+    required this.article,
+    required this.onTap,
+  });
+
+  final NewsArticle article;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Berita: ${article.title}. ${article.summary}',
+      hint: 'Ketuk dua kali untuk membaca detail berita',
+      excludeSemantics: true,
+      child: Material(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        elevation: 0.5,
+        shadowColor: Colors.black12,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: 170,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      article.imageAsset,
+                      fit: BoxFit.cover,
+                      semanticLabel: article.imageSemanticLabel,
+                    ),
+                    Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Color(0xCC002546),
+                            Color(0x00002546),
+                          ],
+                          stops: [0.0, 0.55],
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 14,
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.92),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SvgPicture.asset(
-                              AppAssets.accessibilityBadge,
-                              width: 12,
-                              height: 14,
-                              excludeFromSemantics: true,
-                            ),
-                            const Gap(6),
-                            const Flexible(
-                              child: Text(
-                                'Aksesibilitas Ramah Disabilitas & Lansia',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.primaryNavy,
+                    Positioned(
+                      left: 14,
+                      right: 14,
+                      bottom: 12,
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.92),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SvgPicture.asset(
+                                AppAssets.accessibilityBadge,
+                                width: 12,
+                                height: 14,
+                                excludeFromSemantics: true,
+                              ),
+                              const Gap(6),
+                              Flexible(
+                                child: Text(
+                                  article.badgeLabel,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primaryNavy,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Layanan Pendampingan Kursi Roda & Bahasa Isyarat',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryNavy,
-                      height: 1.4,
-                    ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        article.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryNavy,
+                          height: 1.35,
+                        ),
+                      ),
+                      const Gap(6),
+                      Expanded(
+                        child: Text(
+                          article.summary,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.bodyMuted,
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
+                      const Gap(6),
+                      const Row(
+                        children: [
+                          Text(
+                            'Baca selengkapnya',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          Gap(4),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                            color: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  Gap(8),
-                  Text(
-                    'Tersedia tim asistensi staf di lobi utama untuk membantu pasien lansia, disabilitas netra, rungu, atau hambatan mobilitas tanpa biaya tambahan.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.bodyMuted,
-                      height: 1.55,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
