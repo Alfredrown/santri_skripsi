@@ -282,10 +282,11 @@ class _JadwalScreenState extends ConsumerState<JadwalScreen> {
               const Gap(12),
 
               // Search Bar (48dp min height)
-              Semantics(
-                textField: true,
-                label: 'Cari dokter, spesialisasi, atau poli',
-                child: Container(
+              MergeSemantics(
+                child: Semantics(
+                  label: 'Kolom pencarian poliklinik, dokter, atau spesialisasi',
+                  hint: 'Ketuk dua kali untuk mengetik kata kunci',
+                  child: Container(
                   constraints: const BoxConstraints(
                     minHeight: A11yConstants.minTouchTargetSize,
                   ),
@@ -328,6 +329,7 @@ class _JadwalScreenState extends ConsumerState<JadwalScreen> {
                       ),
                     ],
                   ),
+                ),
                 ),
               ),
               const Gap(14),

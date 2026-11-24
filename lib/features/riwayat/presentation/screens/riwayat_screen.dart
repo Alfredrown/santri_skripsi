@@ -124,10 +124,11 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 ),
                 child: Column(
                   children: [
-                    Semantics(
-                      textField: true,
-                      label: 'Cari diagnosis, obat, atau dokter',
-                      child: Container(
+                    MergeSemantics(
+                      child: Semantics(
+                        label: 'Kolom pencarian riwayat diagnosis, obat, atau dokter',
+                        hint: 'Ketuk dua kali untuk mengetik kata kunci',
+                        child: Container(
                         constraints: const BoxConstraints(
                           minHeight: A11yConstants.minTouchTargetSize,
                         ),
@@ -171,6 +172,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                             ),
                           ],
                         ),
+                      ),
                       ),
                     ),
                     const Gap(12),

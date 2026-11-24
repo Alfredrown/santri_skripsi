@@ -66,10 +66,11 @@ class _BookingStep2DokterScreenState
               const Gap(12),
 
               // Search Bar
-              Semantics(
-                textField: true,
-                label: 'Cari dokter, spesialisasi, atau poli',
-                child: Container(
+              MergeSemantics(
+                child: Semantics(
+                  label: 'Kolom pencarian nama dokter',
+                  hint: 'Ketuk dua kali untuk mencari nama dokter',
+                  child: Container(
                   constraints: const BoxConstraints(
                     minHeight: A11yConstants.minTouchTargetSize,
                   ),
@@ -107,6 +108,7 @@ class _BookingStep2DokterScreenState
                       ),
                     ],
                   ),
+                ),
                 ),
               ),
               const Gap(16),

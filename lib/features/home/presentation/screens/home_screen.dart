@@ -353,10 +353,11 @@ class _SearchBarState extends State<_SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      textField: true,
-      label: 'Cari dokter, spesialisasi, atau poli',
-      child: Container(
+    return MergeSemantics(
+      child: Semantics(
+        label: 'Kolom pencarian dokter, spesialisasi, atau poli',
+        hint: 'Ketuk dua kali untuk mengetik kata kunci pencarian',
+        child: Container(
         constraints: const BoxConstraints(
           minHeight: A11yConstants.minTouchTargetSize,
         ),
@@ -414,6 +415,7 @@ class _SearchBarState extends State<_SearchBar> {
               ),
           ],
         ),
+      ),
       ),
     );
   }
