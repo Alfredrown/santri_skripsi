@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 import '../../application/booking_notifier.dart';
 import '../widgets/booking_stepper.dart';
@@ -124,10 +125,16 @@ class _BookingStep3JadwalScreenState
                                         : AppColors.surface),
                                 borderRadius: BorderRadius.circular(12),
                                 child: InkWell(
-                                  onTap: d.enabled
-                                      ? () =>
-                                          setState(() => _selectedDateIdx = i)
-                                      : null,
+                                  onTap: () {
+                                    if (!d.enabled) {
+                                      AppToast.showError(
+                                        context,
+                                        'Jadwal pada ${d.full} tidak tersedia.',
+                                      );
+                                      return;
+                                    }
+                                    setState(() => _selectedDateIdx = i);
+                                  },
                                   borderRadius: BorderRadius.circular(12),
                                   child: Container(
                                     width: 76,
@@ -228,11 +235,16 @@ class _BookingStep3JadwalScreenState
                                           : AppColors.surface),
                                   borderRadius: BorderRadius.circular(12),
                                   child: InkWell(
-                                    onTap: slot.available
-                                        ? () => setState(
-                                              () => _selectedTime = slot.time,
-                                            )
-                                        : null,
+                                    onTap: () {
+                                      if (!slot.available) {
+                                        AppToast.showError(
+                                          context,
+                                          'Kuota pukul ${slot.time} WIB sudah penuh. Silakan pilih jam lain.',
+                                        );
+                                        return;
+                                      }
+                                      setState(() => _selectedTime = slot.time);
+                                    },
                                     borderRadius: BorderRadius.circular(12),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(

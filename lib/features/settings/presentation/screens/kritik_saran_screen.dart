@@ -1,8 +1,8 @@
 import 'package:gap/gap.dart';
 import 'package:material_ui/material_ui.dart';
-import '../../../../core/accessibility/a11y_announcer.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 
 class KritikSaranScreen extends StatefulWidget {
@@ -26,26 +26,16 @@ class _KritikSaranScreenState extends State<KritikSaranScreen> {
   void _submit() {
     if (_subjectController.text.trim().isEmpty ||
         _messageController.text.trim().isEmpty) {
-      A11yAnnouncer.announce(
+      AppToast.showError(
         context,
-        'Mohon lengkapi subjek dan pesan kritik atau saran terlebih dahulu.',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Mohon lengkapi Subjek dan Pesan terlebih dahulu.'),
-        ),
+        'Gagal mengirim: Mohon lengkapi Subjek dan Pesan terlebih dahulu.',
       );
       return;
     }
 
-    A11yAnnouncer.announce(
+    AppToast.showSuccess(
       context,
-      'Kritik dan saran Anda berhasil dikirim. Terima kasih.',
-    );
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Terima kasih! Kritik dan saran Anda telah dikirim.'),
-      ),
+      'Terima kasih! Kritik dan saran Anda telah dikirim.',
     );
     _subjectController.clear();
     _messageController.clear();

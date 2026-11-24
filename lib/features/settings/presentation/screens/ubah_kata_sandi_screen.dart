@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../core/accessibility/a11y_announcer.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 
 class UbahKataSandiScreen extends StatefulWidget {
@@ -43,35 +44,22 @@ class _UbahKataSandiScreenState extends State<UbahKataSandiScreen> {
         !_hasUpperAndLower ||
         !_hasNumber ||
         !_hasSymbol) {
-      A11yAnnouncer.announce(
+      AppToast.showError(
         context,
-        'Kata sandi baru belum memenuhi seluruh kriteria keamanan.',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Pastikan semua kriteria kata sandi kuat terpenuhi.'),
-        ),
+        'Gagal memperbarui: Pastikan kata sandi lama diisi dan semua kriteria sandi kuat terpenuhi.',
       );
       return;
     }
 
     if (_newController.text != _confirmController.text) {
-      A11yAnnouncer.announce(
+      AppToast.showError(
         context,
-        'Konfirmasi kata sandi baru tidak cocok.',
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Konfirmasi kata sandi tidak cocok.'),
-        ),
+        'Gagal memperbarui: Konfirmasi kata sandi baru tidak cocok.',
       );
       return;
     }
 
-    A11yAnnouncer.announce(context, 'Kata sandi berhasil diperbarui.');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Kata sandi berhasil diperbarui!')),
-    );
+    AppToast.showSuccess(context, 'Kata sandi berhasil diperbarui!');
   }
 
   @override

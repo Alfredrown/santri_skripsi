@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 import '../../application/booking_notifier.dart';
 import '../widgets/booking_stepper.dart';
@@ -42,16 +43,20 @@ class _BookingStep4PasienScreenState
   }
 
   void _showTermsDialog() {
+    if (_nikController.text.trim().isEmpty ||
+        _nameController.text.trim().isEmpty ||
+        _birthController.text.trim().isEmpty) {
+      AppToast.showError(
+        context,
+        'Gagal melanjutkan: Mohon lengkapi NIK, Nama, dan Tanggal Lahir pasien.',
+      );
+      return;
+    }
+
     ref.read(bookingProvider.notifier).updatePatient(
-          nik: _nikController.text.trim().isEmpty
-              ? '312125125125'
-              : _nikController.text.trim(),
-          name: _nameController.text.trim().isEmpty
-              ? 'Ahmed'
-              : _nameController.text.trim(),
-          birthDate: _birthController.text.trim().isEmpty
-              ? '12 Mei 1998'
-              : _birthController.text.trim(),
+          nik: _nikController.text.trim(),
+          name: _nameController.text.trim(),
+          birthDate: _birthController.text.trim(),
           useUserData: _useUserData,
         );
 

@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/secondary_page_header.dart';
 import '../../application/booking_notifier.dart';
 import '../../data/clinic_mock_catalog.dart';
@@ -125,14 +126,19 @@ class _BookingStep2DokterScreenState
                           : const Color(0xFFEBEBEB),
                       borderRadius: BorderRadius.circular(14),
                       child: InkWell(
-                        onTap: doc.available
-                            ? () {
-                                ref
-                                    .read(bookingProvider.notifier)
-                                    .selectDoctor(doc.name);
-                                context.push('/booking/step-3');
-                              }
-                            : null,
+                        onTap: () {
+                          if (!doc.available) {
+                            AppToast.showError(
+                              context,
+                              '${doc.name} tidak dapat dipilih (${doc.status}).',
+                            );
+                            return;
+                          }
+                          ref
+                              .read(bookingProvider.notifier)
+                              .selectDoctor(doc.name);
+                          context.push('/booking/step-3');
+                        },
                         borderRadius: BorderRadius.circular(14),
                         child: Container(
                           padding: const EdgeInsets.all(16),
