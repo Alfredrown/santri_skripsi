@@ -22,36 +22,88 @@ class _BookingStep3JadwalScreenState
   int _selectedDateIdx = 0;
   String _selectedTime = '10.00';
 
-  static const _dates = [
-    (
-      day: 'SENIN',
-      num: '19',
-      month: 'MAR',
-      full: 'Senin, 19 Maret 2026',
-      enabled: true,
-    ),
-    (
-      day: 'SELASA',
-      num: '20',
-      month: 'MAR',
-      full: 'Selasa, 20 Maret 2026',
-      enabled: true,
-    ),
-    (
-      day: 'RABU',
-      num: '21',
-      month: 'MAR',
-      full: 'Rabu, 21 Maret 2026',
-      enabled: false,
-    ),
-    (
-      day: 'KAMIS',
-      num: '22',
-      month: 'MAR',
-      full: 'Kamis, 22 Maret 2026',
-      enabled: true,
-    ),
+  late final List<({String day, String num, String month, String full, bool enabled})>
+      _dates = _buildUpcomingDates();
+
+  static const _dayNamesUpper = [
+    'SENIN',
+    'SELASA',
+    'RABU',
+    'KAMIS',
+    'JUMAT',
+    'SABTU',
+    'MINGGU',
   ];
+
+  static const _dayNamesTitle = [
+    'Senin',
+    'Selasa',
+    'Rabu',
+    'Kamis',
+    'Jumat',
+    'Sabtu',
+    'Minggu',
+  ];
+
+  static const _monthShort = [
+    'JAN',
+    'FEB',
+    'MAR',
+    'APR',
+    'MEI',
+    'JUN',
+    'JUL',
+    'AGU',
+    'SEP',
+    'OKT',
+    'NOV',
+    'DES',
+  ];
+
+  static const _monthFull = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+
+  static List<({String day, String num, String month, String full, bool enabled})>
+      _buildUpcomingDates() {
+    final now = DateTime.now();
+    return List.generate(7, (offset) {
+      final d = now.add(Duration(days: offset));
+      final weekdayIdx = d.weekday - 1; // 0 = Monday .. 6 = Sunday
+      final monthIdx = d.month - 1;
+      // Disable Sunday (Minggu) as hospital outpatient clinics are closed
+      final isEnabled = d.weekday != DateTime.sunday;
+      return (
+        day: _dayNamesUpper[weekdayIdx],
+        num: '${d.day}',
+        month: _monthShort[monthIdx],
+        full:
+            '${_dayNamesTitle[weekdayIdx]}, ${d.day} ${_monthFull[monthIdx]} ${d.year}',
+        enabled: isEnabled,
+      );
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Ensure initial selected date is an enabled day (in case today is Sunday)
+    final firstEnabled = _dates.indexWhere((d) => d.enabled);
+    if (firstEnabled != -1) {
+      _selectedDateIdx = firstEnabled;
+    }
+  }
 
   static const _slots = [
     (time: '08.00', status: 'Sisa 2', available: true),
