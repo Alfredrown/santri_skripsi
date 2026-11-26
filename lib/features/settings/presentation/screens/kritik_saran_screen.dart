@@ -96,6 +96,7 @@ class _KritikSaranScreenState extends State<KritikSaranScreen> {
                             label: 'Subjek kritik dan saran, wajib diisi',
                             child: TextField(
                               controller: _subjectController,
+                              onChanged: (_) => setState(() {}),
                               decoration: InputDecoration(
                                 hintText: 'Masukkan subjek',
                                 hintStyle: const TextStyle(
@@ -104,6 +105,19 @@ class _KritikSaranScreenState extends State<KritikSaranScreen> {
                                 ),
                                 filled: true,
                                 fillColor: const Color(0xFFF0F4FF),
+                                suffixIcon: _subjectController.text.isNotEmpty
+                                    ? IconButton(
+                                        tooltip: 'Hapus subjek',
+                                        onPressed: () {
+                                          _subjectController.clear();
+                                          setState(() {});
+                                        },
+                                        icon: const Icon(
+                                          Icons.close_rounded,
+                                          size: 20,
+                                        ),
+                                      )
+                                    : null,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide.none,
@@ -149,6 +163,7 @@ class _KritikSaranScreenState extends State<KritikSaranScreen> {
                             label: 'Pesan kritik dan saran, wajib diisi',
                             child: TextField(
                               controller: _messageController,
+                              onChanged: (_) => setState(() {}),
                               maxLines: 6,
                               decoration: InputDecoration(
                                 hintText:
@@ -160,6 +175,24 @@ class _KritikSaranScreenState extends State<KritikSaranScreen> {
                                 ),
                                 filled: true,
                                 fillColor: const Color(0xFFF0F4FF),
+                                suffixIcon: _messageController.text.isNotEmpty
+                                    ? Align(
+                                        alignment: Alignment.topRight,
+                                        widthFactor: 1.0,
+                                        heightFactor: 1.0,
+                                        child: IconButton(
+                                          tooltip: 'Hapus pesan',
+                                          onPressed: () {
+                                            _messageController.clear();
+                                            setState(() {});
+                                          },
+                                          icon: const Icon(
+                                            Icons.close_rounded,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      )
+                                    : null,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide.none,

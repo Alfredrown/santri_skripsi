@@ -33,6 +33,13 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   String _selectedYear = '2026 (Tahun Berjalan)';
   String _selectedFilter = 'Semua Kunjungan';
   String _searchQuery = '';
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   static const List<String> _years = [
     '2026 (Tahun Berjalan)',
@@ -148,6 +155,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                             const Gap(10),
                             Expanded(
                               child: TextField(
+                                controller: _searchController,
                                 onChanged: (v) =>
                                     setState(() => _searchQuery = v),
                                 style: const TextStyle(
@@ -170,6 +178,23 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                                 ),
                               ),
                             ),
+                            if (_searchQuery.isNotEmpty)
+                              IconButton(
+                                tooltip: 'Hapus teks pencarian',
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() => _searchQuery = '');
+                                  A11yAnnouncer.announce(
+                                    context,
+                                    'Pencarian dihapus',
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.close_rounded,
+                                  size: 20,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                              ),
                           ],
                         ),
                       ),

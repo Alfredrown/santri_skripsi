@@ -23,6 +23,13 @@ class BookingStep2DokterScreen extends ConsumerStatefulWidget {
 class _BookingStep2DokterScreenState
     extends ConsumerState<BookingStep2DokterScreen> {
   String _searchQuery = '';
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +98,7 @@ class _BookingStep2DokterScreenState
                       const Gap(10),
                       Expanded(
                         child: TextField(
+                          controller: _searchController,
                           onChanged: (v) => setState(() => _searchQuery = v),
                           decoration: const InputDecoration(
                             hintText: 'Cari dokter, spesialisasi, atau poli...',
@@ -106,6 +114,19 @@ class _BookingStep2DokterScreenState
                           ),
                         ),
                       ),
+                      if (_searchQuery.isNotEmpty)
+                        IconButton(
+                          tooltip: 'Hapus teks pencarian',
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                          icon: const Icon(
+                            Icons.close_rounded,
+                            size: 20,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
                     ],
                   ),
                 ),

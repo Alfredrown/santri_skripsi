@@ -124,6 +124,7 @@ class _UbahKataSandiScreenState extends State<UbahKataSandiScreen> {
                             hint: 'Masukkan kata sandi lama Anda',
                             label: 'Kata Sandi Saat Ini',
                             obscure: _obscureOld,
+                            onChanged: (_) => setState(() {}),
                             onToggleObscure: () =>
                                 setState(() => _obscureOld = !_obscureOld),
                           ),
@@ -209,6 +210,7 @@ class _UbahKataSandiScreenState extends State<UbahKataSandiScreen> {
                         hint: 'Ketik ulang kata sandi baru',
                         label: 'Konfirmasi Kata Sandi Baru',
                         obscure: _obscureConfirm,
+                        onChanged: (_) => setState(() {}),
                         onToggleObscure: () =>
                             setState(() => _obscureConfirm = !_obscureConfirm),
                       ),
@@ -326,7 +328,7 @@ class _PasswordField extends StatelessWidget {
     required this.label,
     required this.obscure,
     required this.onToggleObscure,
-    this.onChanged,
+    required this.onChanged,
   });
 
   final TextEditingController controller;
@@ -334,7 +336,7 @@ class _PasswordField extends StatelessWidget {
   final String label;
   final bool obscure;
   final VoidCallback onToggleObscure;
-  final ValueChanged<String>? onChanged;
+  final ValueChanged<String> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -367,15 +369,34 @@ class _PasswordField extends StatelessWidget {
           ),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          suffixIcon: IconButton(
-            tooltip: obscure ? 'Tampilkan kata sandi' : 'Sembunyikan kata sandi',
-            onPressed: onToggleObscure,
-            icon: Icon(
-              obscure
-                  ? Icons.visibility_outlined
-                  : Icons.visibility_off_outlined,
-              color: AppColors.primaryNavy,
-            ),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (controller.text.isNotEmpty)
+                IconButton(
+                  tooltip: 'Hapus $label',
+                  onPressed: () {
+                    controller.clear();
+                    onChanged('');
+                  },
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    size: 20,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              IconButton(
+                tooltip:
+                    obscure ? 'Tampilkan kata sandi' : 'Sembunyikan kata sandi',
+                onPressed: onToggleObscure,
+                icon: Icon(
+                  obscure
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: AppColors.primaryNavy,
+                ),
+              ),
+            ],
           ),
         ),
       ),

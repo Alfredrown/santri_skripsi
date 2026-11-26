@@ -34,6 +34,13 @@ class JadwalScreen extends ConsumerStatefulWidget {
 class _JadwalScreenState extends ConsumerState<JadwalScreen> {
   String _selectedCategoryId = 'klinik-spesialis';
   String _searchQuery = '';
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   static const List<_ServiceCategory> _categories = [
     _ServiceCategory(
@@ -307,6 +314,7 @@ class _JadwalScreenState extends ConsumerState<JadwalScreen> {
                       const Gap(10),
                       Expanded(
                         child: TextField(
+                          controller: _searchController,
                           onChanged: (v) => setState(() => _searchQuery = v),
                           style: const TextStyle(
                             fontSize: 14,
@@ -327,6 +335,20 @@ class _JadwalScreenState extends ConsumerState<JadwalScreen> {
                           ),
                         ),
                       ),
+                      if (_searchQuery.isNotEmpty)
+                        IconButton(
+                          tooltip: 'Hapus teks pencarian',
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                            A11yAnnouncer.announce(context, 'Pencarian dihapus');
+                          },
+                          icon: const Icon(
+                            Icons.close_rounded,
+                            size: 20,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
                     ],
                   ),
                 ),

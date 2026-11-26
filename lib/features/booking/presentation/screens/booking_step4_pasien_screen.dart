@@ -245,25 +245,57 @@ class _BookingStep4PasienScreenState
                     const _FieldLabel('NIK'),
                     TextField(
                       controller: _nikController,
-                      decoration: const InputDecoration(
+                      onChanged: (_) => setState(() {}),
+                      decoration: InputDecoration(
                         hintText: 'Masukkan NIK',
+                        suffixIcon: _nikController.text.isNotEmpty
+                            ? IconButton(
+                                tooltip: 'Hapus NIK',
+                                onPressed: () {
+                                  _nikController.clear();
+                                  setState(() {});
+                                },
+                                icon: const Icon(Icons.close_rounded, size: 20),
+                              )
+                            : null,
                       ),
                     ),
                     const Gap(12),
                     const _FieldLabel('Nama'),
                     TextField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
+                      onChanged: (_) => setState(() {}),
+                      decoration: InputDecoration(
                         hintText: 'Masukkan Nama Lengkap',
+                        suffixIcon: _nameController.text.isNotEmpty
+                            ? IconButton(
+                                tooltip: 'Hapus Nama',
+                                onPressed: () {
+                                  _nameController.clear();
+                                  setState(() {});
+                                },
+                                icon: const Icon(Icons.close_rounded, size: 20),
+                              )
+                            : null,
                       ),
                     ),
                     const Gap(12),
                     const _FieldLabel('Tanggal Lahir'),
                     TextField(
                       controller: _birthController,
-                      decoration: const InputDecoration(
+                      onChanged: (_) => setState(() {}),
+                      decoration: InputDecoration(
                         hintText: 'Masukkan Tanggal Lahir',
-                        suffixIcon: Icon(Icons.calendar_today_outlined),
+                        suffixIcon: _birthController.text.isNotEmpty
+                            ? IconButton(
+                                tooltip: 'Hapus Tanggal Lahir',
+                                onPressed: () {
+                                  _birthController.clear();
+                                  setState(() {});
+                                },
+                                icon: const Icon(Icons.close_rounded, size: 20),
+                              )
+                            : const Icon(Icons.calendar_today_outlined),
                       ),
                     ),
                     const Gap(20),
