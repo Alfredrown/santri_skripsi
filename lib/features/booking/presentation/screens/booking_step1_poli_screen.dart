@@ -49,7 +49,10 @@ class _BookingStep1PoliScreenState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SecondaryPageHeader(title: ''),
-              const BookingStepper(currentStep: 1),
+              BookingStepper(
+                currentStep: 1,
+                totalSteps: booking.totalSteps,
+              ),
               const Gap(18),
               Semantics(
                 header: true,
@@ -204,10 +207,14 @@ class _BookingStep1PoliScreenState
                       borderRadius: BorderRadius.circular(14),
                       child: InkWell(
                         onTap: () {
-                          ref
-                              .read(bookingProvider.notifier)
-                              .selectPoli(poli.name);
-                          context.push('/booking/step-2');
+                          final notifier = ref.read(bookingProvider.notifier);
+                          notifier.selectPoli(poli.name);
+                          if (booking.skipsDoctorSelection) {
+                            notifier.selectDoctor('Dokter Jaga ${poli.name}');
+                            context.push('/booking/step-3');
+                          } else {
+                            context.push('/booking/step-2');
+                          }
                         },
                         borderRadius: BorderRadius.circular(14),
                         child: Container(

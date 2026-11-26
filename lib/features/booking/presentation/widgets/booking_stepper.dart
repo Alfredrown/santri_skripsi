@@ -7,19 +7,21 @@ class BookingStepper extends StatelessWidget {
   const BookingStepper({
     super.key,
     required this.currentStep,
+    this.totalSteps = 4,
   });
 
-  /// 1-based index: 1, 2, 3, or 4.
+  /// 1-based index: 1..totalSteps.
   final int currentStep;
+  final int totalSteps;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'Langkah $currentStep dari 4',
+      label: 'Langkah $currentStep dari $totalSteps',
       excludeSemantics: true,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(4, (index) {
+        children: List.generate(totalSteps, (index) {
           final step = index + 1;
           final isCompleted = step < currentStep;
           final isActive = step == currentStep;
@@ -31,7 +33,7 @@ class BookingStepper extends StatelessWidget {
                 isCompleted: isCompleted,
                 isActive: isActive,
               ),
-              if (step < 4) ...[
+              if (step < totalSteps) ...[
                 const Gap(8),
                 const Row(
                   children: [

@@ -25,6 +25,10 @@ class BookingFlowState {
   final String patientBirthDate;
   final bool useUserData;
 
+  /// Klinik Spesialis skips doctor selection (3 steps instead of 4).
+  bool get skipsDoctorSelection => clinicCategory == 'Klinik Spesialis';
+  int get totalSteps => skipsDoctorSelection ? 3 : 4;
+
   BookingFlowState copyWith({
     String? clinicCategory,
     String? selectedPoli,

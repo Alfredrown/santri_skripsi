@@ -172,7 +172,10 @@ class _BookingStep4PasienScreenState
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SecondaryPageHeader(title: ''),
-                    const BookingStepper(currentStep: 4),
+                    BookingStepper(
+                      currentStep: booking.skipsDoctorSelection ? 3 : 4,
+                      totalSteps: booking.totalSteps,
+                    ),
                     const Gap(18),
                     Semantics(
                       header: true,
