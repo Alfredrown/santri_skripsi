@@ -245,57 +245,84 @@ class _BookingStep4PasienScreenState
                     const _FieldLabel('NIK'),
                     TextField(
                       controller: _nikController,
+                      enabled: !_useUserData,
                       onChanged: (_) => setState(() {}),
                       decoration: InputDecoration(
                         hintText: 'Masukkan NIK',
-                        suffixIcon: _nikController.text.isNotEmpty
-                            ? IconButton(
-                                tooltip: 'Hapus NIK',
-                                onPressed: () {
-                                  _nikController.clear();
-                                  setState(() {});
-                                },
-                                icon: const Icon(Icons.close_rounded, size: 20),
-                              )
-                            : null,
+                        filled: true,
+                        fillColor: _useUserData
+                            ? const Color(0xFFE5E7EB)
+                            : AppColors.surface,
+                        suffixIcon:
+                            !_useUserData && _nikController.text.isNotEmpty
+                                ? IconButton(
+                                    tooltip: 'Hapus NIK',
+                                    onPressed: () {
+                                      _nikController.clear();
+                                      setState(() {});
+                                    },
+                                    icon: const Icon(
+                                      Icons.close_rounded,
+                                      size: 20,
+                                    ),
+                                  )
+                                : null,
                       ),
                     ),
                     const Gap(12),
                     const _FieldLabel('Nama'),
                     TextField(
                       controller: _nameController,
+                      enabled: !_useUserData,
                       onChanged: (_) => setState(() {}),
                       decoration: InputDecoration(
                         hintText: 'Masukkan Nama Lengkap',
-                        suffixIcon: _nameController.text.isNotEmpty
-                            ? IconButton(
-                                tooltip: 'Hapus Nama',
-                                onPressed: () {
-                                  _nameController.clear();
-                                  setState(() {});
-                                },
-                                icon: const Icon(Icons.close_rounded, size: 20),
-                              )
-                            : null,
+                        filled: true,
+                        fillColor: _useUserData
+                            ? const Color(0xFFE5E7EB)
+                            : AppColors.surface,
+                        suffixIcon:
+                            !_useUserData && _nameController.text.isNotEmpty
+                                ? IconButton(
+                                    tooltip: 'Hapus Nama',
+                                    onPressed: () {
+                                      _nameController.clear();
+                                      setState(() {});
+                                    },
+                                    icon: const Icon(
+                                      Icons.close_rounded,
+                                      size: 20,
+                                    ),
+                                  )
+                                : null,
                       ),
                     ),
                     const Gap(12),
                     const _FieldLabel('Tanggal Lahir'),
                     TextField(
                       controller: _birthController,
+                      enabled: !_useUserData,
                       onChanged: (_) => setState(() {}),
                       decoration: InputDecoration(
                         hintText: 'Masukkan Tanggal Lahir',
-                        suffixIcon: _birthController.text.isNotEmpty
-                            ? IconButton(
-                                tooltip: 'Hapus Tanggal Lahir',
-                                onPressed: () {
-                                  _birthController.clear();
-                                  setState(() {});
-                                },
-                                icon: const Icon(Icons.close_rounded, size: 20),
-                              )
-                            : const Icon(Icons.calendar_today_outlined),
+                        filled: true,
+                        fillColor: _useUserData
+                            ? const Color(0xFFE5E7EB)
+                            : AppColors.surface,
+                        suffixIcon:
+                            !_useUserData && _birthController.text.isNotEmpty
+                                ? IconButton(
+                                    tooltip: 'Hapus Tanggal Lahir',
+                                    onPressed: () {
+                                      _birthController.clear();
+                                      setState(() {});
+                                    },
+                                    icon: const Icon(
+                                      Icons.close_rounded,
+                                      size: 20,
+                                    ),
+                                  )
+                                : const Icon(Icons.calendar_today_outlined),
                       ),
                     ),
                     const Gap(20),
