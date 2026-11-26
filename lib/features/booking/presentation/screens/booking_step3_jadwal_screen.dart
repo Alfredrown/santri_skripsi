@@ -19,8 +19,8 @@ class BookingStep3JadwalScreen extends ConsumerStatefulWidget {
 
 class _BookingStep3JadwalScreenState
     extends ConsumerState<BookingStep3JadwalScreen> {
-  int _selectedDateIdx = 0;
-  String _selectedTime = '10.00';
+  int? _selectedDateIdx;
+  String? _selectedTime;
 
   late final List<
       ({
@@ -109,16 +109,6 @@ class _BookingStep3JadwalScreenState
         enabled: isEnabled,
       );
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Ensure initial selected date is an enabled day (in case today is Sunday)
-    final firstEnabled = _dates.indexWhere((d) => d.enabled);
-    if (firstEnabled != -1) {
-      _selectedDateIdx = firstEnabled;
-    }
   }
 
   static const _slots = [
@@ -380,9 +370,31 @@ class _BookingStep3JadwalScreenState
                 ),
                 child: ElevatedButton(
                   onPressed: () {
+                    if (_selectedDateIdx == null && _selectedTime == null) {
+                      AppToast.showError(
+                        context,
+                        'Mohon pilih tanggal dan jam konsultasi terlebih dahulu.',
+                      );
+                      return;
+                    }
+                    if (_selectedDateIdx == null) {
+                      AppToast.showError(
+                        context,
+                        'Mohon pilih tanggal kunjungan terlebih dahulu.',
+                      );
+                      return;
+                    }
+                    if (_selectedTime == null) {
+                      AppToast.showError(
+                        context,
+                        'Mohon pilih jam konsultasi terlebih dahulu.',
+                      );
+                      return;
+                    }
+                    final pickedDate = _dates[_selectedDateIdx!];
                     ref.read(bookingProvider.notifier).selectSchedule(
-                          date: _dates[_selectedDateIdx].full,
-                          dateTime: _dates[_selectedDateIdx].dateTime,
+                          date: pickedDate.full,
+                          dateTime: pickedDate.dateTime,
                           time: '$_selectedTime WIB',
                         );
                     context.push('/booking/step-4');
