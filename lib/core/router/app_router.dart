@@ -9,6 +9,7 @@ import '../../features/booking/presentation/screens/booking_step6_success_screen
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/news/presentation/screens/news_detail_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
+import '../../features/riwayat/presentation/screens/detail_riwayat_screen.dart';
 import '../../features/services/presentation/screens/pelayanan_operasi_screen.dart';
 import '../../features/services/presentation/screens/rawat_inap_screen.dart';
 import '../../features/settings/presentation/screens/faq_screen.dart';
@@ -90,6 +91,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/notifikasi',
         name: 'notifikasi',
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/riwayat/:id',
+        name: 'detail-riwayat',
+        builder: (context, state) => DetailRiwayatScreen(
+          visitId: state.pathParameters['id'] ?? '',
+        ),
       ),
     ],
   );

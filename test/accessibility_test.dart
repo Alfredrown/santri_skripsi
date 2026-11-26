@@ -11,6 +11,7 @@ import 'package:santri_skripsi/features/booking/presentation/screens/booking_ste
 import 'package:santri_skripsi/features/booking/presentation/screens/booking_step6_success_screen.dart';
 import 'package:santri_skripsi/features/news/presentation/screens/news_detail_screen.dart';
 import 'package:santri_skripsi/features/notifications/presentation/screens/notifications_screen.dart';
+import 'package:santri_skripsi/features/riwayat/presentation/screens/detail_riwayat_screen.dart';
 import 'package:santri_skripsi/features/services/presentation/screens/pelayanan_operasi_screen.dart';
 import 'package:santri_skripsi/features/services/presentation/screens/rawat_inap_screen.dart';
 import 'package:santri_skripsi/features/settings/presentation/screens/faq_screen.dart';
@@ -68,6 +69,7 @@ void main() {
     'NewsDetailScreen':
         const NewsDetailScreen(articleId: 'pendampingan-kursi-roda'),
     'NotificationsScreen': const NotificationsScreen(),
+    'DetailRiwayatScreen': const DetailRiwayatScreen(visitId: 'visit-1'),
     'BookingStep1PoliScreen': const BookingStep1PoliScreen(),
     'BookingStep2DokterScreen': const BookingStep2DokterScreen(),
     'BookingStep3JadwalScreen': const BookingStep3JadwalScreen(),

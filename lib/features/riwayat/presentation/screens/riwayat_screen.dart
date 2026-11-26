@@ -1,26 +1,12 @@
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import '../../../../core/accessibility/a11y_announcer.dart';
 import '../../../../core/accessibility/a11y_constants.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
-
-class _VisitHistoryItem {
-  const _VisitHistoryItem({
-    required this.dateLabel,
-    required this.timeLabel,
-    required this.serviceType,
-    required this.poliklinik,
-    required this.doctorName,
-  });
-
-  final String dateLabel;
-  final String timeLabel;
-  final String serviceType;
-  final String poliklinik;
-  final String doctorName;
-}
+import '../../data/riwayat_mock_data.dart';
 
 class RiwayatScreen extends StatefulWidget {
   const RiwayatScreen({super.key});
@@ -47,33 +33,10 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     '2024',
   ];
 
-  static const List<_VisitHistoryItem> _visits = [
-    _VisitHistoryItem(
-      dateLabel: '14 Oktober 2026',
-      timeLabel: '09:40 WIB',
-      serviceType: 'Rawat Jalan',
-      poliklinik: 'Poliklinik Anak',
-      doctorName: 'dr. Sarah Melati, Sp.A',
-    ),
-    _VisitHistoryItem(
-      dateLabel: '02 September 2026',
-      timeLabel: '11:15 WIB',
-      serviceType: 'Rawat Jalan',
-      poliklinik: 'Poli Gigi',
-      doctorName: 'drg. Budi Santoso, Sp.KG',
-    ),
-    _VisitHistoryItem(
-      dateLabel: '19 Agustus 2026',
-      timeLabel: '08:30 WIB',
-      serviceType: 'Telemedicine',
-      poliklinik: 'Poli Jantung & Pembuluh Darah',
-      doctorName: 'dr. Malik Kudus, Sp.JP',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final filtered = _visits.where((item) {
+    const visits = RiwayatMockData.visits;
+    final filtered = visits.where((item) {
       final matchesFilter = _selectedFilter == 'Semua Kunjungan' ||
           item.serviceType == _selectedFilter;
       final q = _searchQuery.trim().toLowerCase();
@@ -266,7 +229,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                   children: [
                     _FilterChipButton(
                       label: 'Semua Kunjungan',
-                      count: _visits.length,
+                      count: visits.length,
                       icon: Icons.done_all_rounded,
                       isSelected: _selectedFilter == 'Semua Kunjungan',
                       onTap: () {
@@ -324,12 +287,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                       elevation: 0.5,
                       shadowColor: Colors.black12,
                       child: InkWell(
-                        onTap: () {
-                          A11yAnnouncer.announce(
-                            context,
-                            'Membuka detail kunjungan ${visit.poliklinik}',
-                          );
-                        },
+                        onTap: () => context.push('/riwayat/${visit.id}'),
                         borderRadius: BorderRadius.circular(14),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
