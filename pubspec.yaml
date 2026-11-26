@@ -68,6 +68,13 @@ flutter:
     - assets/images/
     - assets/icons/
 
+  fonts:
+    - family: SF Pro
+      fonts:
+        - asset: assets/fonts/SFPro.ttf
+        - asset: assets/fonts/SFPro-Italic.ttf
+          style: italic
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

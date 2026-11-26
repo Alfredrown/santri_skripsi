@@ -23,6 +23,7 @@ abstract final class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
+      fontFamily: 'SF Pro',
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
       // Ensures all interactive Material buttons reserve at least 48x48dp hit area
