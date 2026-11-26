@@ -400,8 +400,18 @@ class _BookingStep3JadwalScreenState
                     context.push('/booking/step-4');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.onPrimary,
+                    backgroundColor:
+                        (_selectedDateIdx != null && _selectedTime != null)
+                            ? AppColors.primary
+                            : const Color(0xFFD1D5DB),
+                    foregroundColor:
+                        (_selectedDateIdx != null && _selectedTime != null)
+                            ? AppColors.onPrimary
+                            : const Color(0xFF4B5563),
+                    elevation:
+                        (_selectedDateIdx != null && _selectedTime != null)
+                            ? 2
+                            : 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
